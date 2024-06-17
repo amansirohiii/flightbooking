@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book New Flight</title>
+</head>
+<body>
+    <h1>Book New Flight</h1>
+    <form action="/bookings" method="POST">
+        <div>
+            <label for="flightNumber">Flight Number:</label>
+            <input type="text" id="flightNumber" name="flightNumber" required>
+        </div>
+        <div>
+            <label for="passengerName">Passenger Name:</label>
+            <input type="text" id="passengerName" name="passengerName" required>
+        </div>
+        <div>
+            <label for="departureDate">Departure Date:</label>
+            <input type="date" id="departureDate" name="departureDate" required>
+        </div>
+        <div>
+            <label for="seatNumber">Seat Number:</label>
+            <input type="text" id="seatNumber" name="seatNumber" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+        </div>
+        <button type="submit">Book Flight</button>
+    </form>
+</body>
+</html>

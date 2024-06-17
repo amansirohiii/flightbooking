@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1>Flight Booking System</h1>
+    <button onclick="window.location.href='/bookings/new'">Book New Flight</button>
     <ul id="bookings">
         <% bookings.forEach(booking => { %>
             <li id="booking-<%= booking._id %>">
@@ -62,7 +63,8 @@
                     </form>
                     <form action="/bookings/${booking._id}/edit" method="GET" style="display:inline;">
                         <button type="submit">Update</button>
-                    `;
+                    </form>
+                `;
             }
         };
 

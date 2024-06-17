@@ -137,7 +137,7 @@ app.post('/bookings', async (req, res) => {
             // Delete the temporary file
             fs.unlinkSync(tempPdfPath);
 
-            res.status(201).send(booking);
+            res.status(201).redirect("/bookings");
         });
     } catch (error) {
         console.error('Error creating booking', error);
@@ -152,6 +152,9 @@ app.get('/bookings', async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
+});
+app.get('/bookings/new', (req, res) => {
+    res.render('new');
 });
 
 app.get('/bookings/:id/edit', async (req, res) => {

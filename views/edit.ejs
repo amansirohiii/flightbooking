@@ -8,20 +8,27 @@
 <body>
     <h1>Edit Booking</h1>
     <form action="/bookings/<%= booking._id %>?_method=PUT" method="POST">
-        <label for="flightNumber">Flight Number:</label>
-        <input type="text" id="flightNumber" name="flightNumber" value="<%= booking.flightNumber %>" required><br>
-        <label for="passengerName">Passenger Name:</label>
-        <input type="text" id="passengerName" name="passengerName" value="<%= booking.passengerName %>" required><br>
-        <label for="departureDate">Departure Date:</label>
-        <input type="date" id="departureDate" name="departureDate" value="<%= booking.departureDate.toISOString().split('T')[0] %>" required><br>
-        <label for="seatNumber">Seat Number:</label>
-        <input type="text" id="seatNumber" name="seatNumber" value="<%= booking.seatNumber %>" required><br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<%= booking.email %>" required><br>
+        <div>
+            <label for="flightNumber">Flight Number:</label>
+            <input type="text" id="flightNumber" name="flightNumber" value="<%= booking.flightNumber %>" required>
+        </div>
+        <div>
+            <label for="passengerName">Passenger Name:</label>
+            <input type="text" id="passengerName" name="passengerName" value="<%= booking.passengerName %>" required>
+        </div>
+        <div>
+            <label for="departureDate">Departure Date:</label>
+            <input type="date" id="departureDate" name="departureDate" value="<%= booking.departureDate.toISOString().split('T')[0] %>" required>
+        </div>
+        <div>
+            <label for="seatNumber">Seat Number:</label>
+            <input type="text" id="seatNumber" name="seatNumber" value="<%= booking.seatNumber %>" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="<%= booking.email %>">
+        </div>
         <button type="submit">Update Booking</button>
-    </form>
-    <form action="/bookings" method="GET">
-        <button type="submit">Back to Bookings</button>
     </form>
 </body>
 </html>
