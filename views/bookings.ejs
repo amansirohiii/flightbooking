@@ -9,25 +9,25 @@
     <h1>Flight Booking System</h1>
     <button onclick="window.location.href='/bookings/new'">Book New Flight</button>
     <ul id="bookings">
-        <% if (bookings && bookings.length > 0) { %>
-            <% bookings.forEach(booking => { %>
-                <li id="booking-<%= booking._id %>">
-                    Flight Number: <%= booking.flightNumber %>,
-                    Passenger Name: <%= booking.passengerName %>,
-                    Departure Date: <%= booking.departureDate.toISOString().split('T')[0] %>,
-                    Seat Number: <%= booking.seatNumber %>,
-                    Email: <%= booking.email %>
-                    <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline;">
-                        <button type="submit">Delete</button>
-                    </form>
-                    <form action="/bookings/<%= booking._id %>/edit" method="GET" style="display:inline;">
-                        <button type="submit">Update</button>
-                    </form>
-                </li>
-            <% }); %>
-        <% } else { %>
-            <li>No bookings found.</li>
-        <% } %>
+        <% bookings.forEach(booking => { %>
+            <li id="booking-<%= booking._id %>">
+                Flight Number: <%= booking.flightNumber %>,
+                Passenger Name: <%= booking.passengerName %>,
+                <% if (booking.departureDate) { %>
+                    Departure Date: <%= new Date(booking.departureDate).toISOString().split('T')[0] %>,
+                <% } else { %>
+                    Departure Date: Not specified,
+                <% } %>
+                Seat Number: <%= booking.seatNumber %>,
+                Email: <%= booking.email %>
+                <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+                <form action="/bookings/<%= booking._id %>/edit" method="GET" style="display:inline;">
+                    <button type="submit">Update</button>
+                </form>
+            </li>
+        <% }); %>
     </ul>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
@@ -41,7 +41,7 @@
             listItem.innerHTML = `
                 Flight Number: ${booking.flightNumber},
                 Passenger Name: ${booking.passengerName},
-                Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},
+                ${ booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},` : `Departure Date: Not specified,` }
                 Seat Number: ${booking.seatNumber},
                 Email: ${booking.email}
                 <form action="/bookings/${booking._id}?_method=DELETE" method="POST" style="display:inline;">
@@ -59,7 +59,7 @@
                 listItem.innerHTML = `
                     Flight Number: ${booking.flightNumber},
                     Passenger Name: ${booking.passengerName},
-                    Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},
+                    ${ booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},` : `Departure Date: Not specified,` }
                     Seat Number: ${booking.seatNumber},
                     Email: ${booking.email}
                     <form action="/bookings/${booking._id}?_method=DELETE" method="POST" style="display:inline;">
