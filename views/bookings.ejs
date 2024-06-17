@@ -9,21 +9,25 @@
     <h1>Flight Booking System</h1>
     <button onclick="window.location.href='/bookings/new'">Book New Flight</button>
     <ul id="bookings">
-        <% bookings.forEach(booking => { %>
-            <li id="booking-<%= booking._id %>">
-                Flight Number: <%= booking.flightNumber %>,
-                Passenger Name: <%= booking.passengerName %>,
-                Departure Date: <%= booking.departureDate.toISOString().split('T')[0] %>,
-                Seat Number: <%= booking.seatNumber %>,
-                Email: <%= booking.email %>
-                <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
-                </form>
-                <form action="/bookings/<%= booking._id %>/edit" method="GET" style="display:inline;">
-                    <button type="submit">Update</button>
-                </form>
-            </li>
-        <% }); %>
+        <% if (bookings && bookings.length > 0) { %>
+            <% bookings.forEach(booking => { %>
+                <li id="booking-<%= booking._id %>">
+                    Flight Number: <%= booking.flightNumber %>,
+                    Passenger Name: <%= booking.passengerName %>,
+                    Departure Date: <%= booking.departureDate.toISOString().split('T')[0] %>,
+                    Seat Number: <%= booking.seatNumber %>,
+                    Email: <%= booking.email %>
+                    <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                    <form action="/bookings/<%= booking._id %>/edit" method="GET" style="display:inline;">
+                        <button type="submit">Update</button>
+                    </form>
+                </li>
+            <% }); %>
+        <% } else { %>
+            <li>No bookings found.</li>
+        <% } %>
     </ul>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
