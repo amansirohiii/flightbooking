@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import ejs from 'ejs';
+import { PassThrough } from 'stream';
 import connectDB from './db/connection.js';
 import dotenv from 'dotenv';
 
@@ -54,9 +55,10 @@ const upload = multer({ storage: storage });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.set("views", __dirname + "/views");
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.use(express.static(__dirname + "public"));
+app.use(express.static(path.join(__dirname, "public")));
+
 // MongoDB connection
 connectDB();
 
@@ -70,27 +72,30 @@ const bookingSchema = new mongoose.Schema({
     email: { type: String, default: 'amansirohi077@gmail.com' },
 });
 
-
 const Booking = mongoose.model('Booking', bookingSchema);
 
-const createPDF = (booking, pdfPath) => {
+// Function to create PDF in memory
+const createPDF = (booking) => {
     return new Promise((resolve, reject) => {
         const pdfDoc = new PDFDocument();
-        const writeStream = fs.createWriteStream(pdfPath);
-        pdfDoc.pipe(writeStream);
+        const passThrough = new PassThrough();
+
+        const chunks = [];
+        passThrough.on('data', chunk => chunks.push(chunk));
+        passThrough.on('end', () => resolve(Buffer.concat(chunks)));
+        passThrough.on('error', reject);
+
+        pdfDoc.pipe(passThrough);
 
         pdfDoc.text(`Booking Details:\nEmail Address: ${booking.email}\nFlight Number: ${booking.flightNumber}\nPassenger Name: ${booking.passengerName}\nDeparture Date: ${booking.departureDate}\nSeat Number: ${booking.seatNumber}`);
         pdfDoc.end();
-
-        writeStream.on('finish', () => resolve(pdfPath));
-        writeStream.on('error', reject);
     });
 };
 
 app.get("/", (req, res) => {
     res.render('index');
-}
-);
+});
+
 // CRUD Operations
 app.post('/bookings', async (req, res) => {
     try {
@@ -98,18 +103,17 @@ app.post('/bookings', async (req, res) => {
         if (!bookingData.email) {
             bookingData.email = 'amansirohi077@gmail.com';
         }
-        const booking = new Booking(req.body);
+        const booking = new Booking(bookingData);
         await booking.save();
 
         // Notify via Socket.io
         io.emit('bookingCreated', booking);
 
-        // Generate PDF and store it temporarily
-        const tempPdfPath = path.join(__dirname, `${booking._id}.pdf`);
-        await createPDF(booking, tempPdfPath);
+        // Generate PDF in memory
+        const pdfBuffer = await createPDF(booking);
 
         // Upload PDF to Cloudinary
-        cloudinary.uploader.upload(tempPdfPath, { folder: 'bookings', public_id: booking._id.toString(), resource_type: 'raw' }, async (error, result) => {
+        cloudinary.uploader.upload_stream({ folder: 'bookings', public_id: booking._id.toString(), resource_type: 'raw' }, async (error, result) => {
             if (error) {
                 throw error;
             }
@@ -127,18 +131,15 @@ app.post('/bookings', async (req, res) => {
                 attachments: [
                     {
                         filename: `${booking._id}.pdf`,
-                        path: tempPdfPath
+                        content: pdfBuffer
                     }
                 ]
             };
 
             await transporter.sendMail(mailOptions);
 
-            // Delete the temporary file
-            fs.unlinkSync(tempPdfPath);
-
             res.status(201).redirect("/bookings");
-        });
+        }).end(pdfBuffer);
     } catch (error) {
         console.error('Error creating booking', error);
         res.status(400).send(error);
@@ -153,6 +154,7 @@ app.get('/bookings', async (req, res) => {
         res.status(500).send(error);
     }
 });
+
 app.get('/bookings/new', (req, res) => {
     res.render('new');
 });
@@ -179,11 +181,10 @@ app.put('/bookings/:id', async (req, res) => {
         // Notify via Socket.io
         io.emit('bookingUpdated', booking);
 
-        // Send email
-        const tempPdfPath = path.join(__dirname, `${booking._id}.pdf`);
-        await createPDF(booking, tempPdfPath);
+        // Generate PDF in memory
+        const pdfBuffer = await createPDF(booking);
 
-        cloudinary.uploader.upload(tempPdfPath, { folder: 'bookings', public_id: booking._id.toString(), resource_type: 'raw' }, async (error, result) => {
+        cloudinary.uploader.upload_stream({ folder: 'bookings', public_id: booking._id.toString(), resource_type: 'raw' }, async (error, result) => {
             if (error) {
                 throw error;
             }
@@ -199,16 +200,14 @@ app.put('/bookings/:id', async (req, res) => {
                 attachments: [
                     {
                         filename: `${booking._id}.pdf`,
-                        path: tempPdfPath
+                        content: pdfBuffer
                     }
                 ]
             };
 
             await transporter.sendMail(mailOptions);
-            fs.unlinkSync(tempPdfPath);
             res.redirect('/bookings');
-            // res.send(booking);
-        });
+        }).end(pdfBuffer);
     } catch (error) {
         res.status(400).send(error);
     }
@@ -234,7 +233,7 @@ app.delete('/bookings/:id', async (req, res) => {
         await transporter.sendMail(mailOptions);
 
         res.redirect('/bookings');
-        } catch (error) {
+    } catch (error) {
         res.status(500).send(error);
     }
 });
