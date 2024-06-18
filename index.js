@@ -4,13 +4,12 @@ import methodOverride from 'method-override';
 import http from 'http';
 import { Server as socketIo } from 'socket.io';
 import nodemailer from 'nodemailer';
-import PDFDocument from 'pdfkit';
 import { v2 as cloudinary } from 'cloudinary';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { PassThrough } from 'stream';
 import connectDB from './db/connection.js';
 import Booking from './models/Booking.model.js'
+import { createPDF } from "./utils/pdf.js";
 import dotenv from 'dotenv';
 
 dotenv.config({ path: `.env.local`, override: true });
@@ -57,24 +56,6 @@ app.use(express.static(path.join(__dirname, "public")));
 connectDB();
 
 
-// Function to create PDF in memory
-const createPDF = (booking) => {
-    return new Promise((resolve, reject) => {
-        const pdfDoc = new PDFDocument();
-        const passThrough = new PassThrough();
-
-        const chunks = [];
-        passThrough.on('data', chunk => chunks.push(chunk));
-        passThrough.on('end', () => resolve(Buffer.concat(chunks)));
-        passThrough.on('error', reject);
-
-        pdfDoc.pipe(passThrough);
-
-        pdfDoc.text(`Booking Details:\nEmail Address: ${booking.email}\nFlight Number: ${booking.flightNumber}\nPassenger Name: ${booking.passengerName}\nDeparture Date: ${booking.departureDate}\nSeat Number: ${booking.seatNumber}`);
-        pdfDoc.end();
-    });
-};
-
 app.get("/", (req, res) => {
     res.render('index');
 });
@@ -110,7 +91,7 @@ app.post('/bookings', async (req, res) => {
                 from: process.env.EMAIL_USER,
                 to: booking.email,
                 subject: 'Booking Confirmation',
-                text: `Your booking details are attached.\n\nYou can also access your booking details here: ${booking.pdfUrl}`,
+                text: `Your booking details are attached.\n\nThank you for choosing us.`,
                 attachments: [
                     {
                         filename: `${booking._id}.pdf`,
@@ -179,7 +160,7 @@ app.put('/bookings/:id', async (req, res) => {
                 from: process.env.EMAIL_USER,
                 to: booking.email,
                 subject: 'Booking Update',
-                text: `Your booking details have been updated.\n\nYou can access your updated booking details here: ${booking.pdfUrl}`,
+                text: `Your booking details have been updated.\n\nThank you for choosing us.`,
                 attachments: [
                     {
                         filename: `${booking._id}.pdf`,
