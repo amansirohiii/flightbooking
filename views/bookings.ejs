@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Booking System</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
     <h1>Flight Booking System</h1>
     <button onclick="window.location.href='/bookings/new'">Book New Flight</button>
@@ -13,11 +16,7 @@
             <li id="booking-<%= booking._id %>">
                 Flight Number: <%= booking.flightNumber %>,
                 Passenger Name: <%= booking.passengerName %>,
-                <% if (booking.departureDate) { %>
-                    Departure Date: <%= new Date(booking.departureDate).toISOString().split('T')[0] %>,
-                <% } else { %>
-                    Departure Date: Not specified,
-                <% } %>
+                <%= booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]}` : 'Departure Date: Not specified' %>,
                 Seat Number: <%= booking.seatNumber %>,
                 Email: <%= booking.email %>
                 <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline;">
@@ -31,35 +30,17 @@
     </ul>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        const socket = io('https://flightbooking.amansirohi.me');  // Adjust the URL if necessary
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io('https://flightbooking.amansirohi.me');  // Adjust the URL if necessary
+            const bookingsList = document.getElementById('bookings');
 
-        const bookingsList = document.getElementById('bookings');
-
-        const addBookingToList = (booking) => {
-            const listItem = document.createElement('li');
-            listItem.id = `booking-${booking._id}`;
-            listItem.innerHTML = `
-                Flight Number: ${booking.flightNumber},
-                Passenger Name: ${booking.passengerName},
-                ${ booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},` : `Departure Date: Not specified,` }
-                Seat Number: ${booking.seatNumber},
-                Email: ${booking.email}
-                <form action="/bookings/${booking._id}?_method=DELETE" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
-                </form>
-                <form action="/bookings/${booking._id}/edit" method="GET" style="display:inline;">
-                    <button type="submit">Update</button>
-                `;
-            bookingsList.appendChild(listItem);
-        };
-
-        const updateBookingInList = (booking) => {
-            const listItem = document.getElementById(`booking-${booking._id}`);
-            if (listItem) {
+            const createBookingListItem = (booking) => {
+                const listItem = document.createElement('li');
+                listItem.id = `booking-${booking._id}`;
                 listItem.innerHTML = `
                     Flight Number: ${booking.flightNumber},
                     Passenger Name: ${booking.passengerName},
-                    ${ booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]},` : `Departure Date: Not specified,` }
+                    ${booking.departureDate ? `Departure Date: ${new Date(booking.departureDate).toISOString().split('T')[0]}` : 'Departure Date: Not specified'},
                     Seat Number: ${booking.seatNumber},
                     Email: ${booking.email}
                     <form action="/bookings/${booking._id}?_method=DELETE" method="POST" style="display:inline;">
@@ -67,33 +48,38 @@
                     </form>
                     <form action="/bookings/${booking._id}/edit" method="GET" style="display:inline;">
                         <button type="submit">Update</button>
-                    </form>
                 `;
-            }
-        };
+                return listItem;
+            };
 
-        const removeBookingFromList = (booking) => {
-            const listItem = document.getElementById(`booking-${booking._id}`);
-            if (listItem) {
-                listItem.remove();
-            }
-        };
+            const addBookingToList = (booking) => {
+                const listItem = createBookingListItem(booking);
+                bookingsList.appendChild(listItem);
+            };
 
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        });
+            const updateBookingInList = (booking) => {
+                const listItem = document.getElementById(`booking-${booking._id}`);
+                if (listItem) {
+                    listItem.replaceWith(createBookingListItem(booking));
+                }
+            };
 
-        socket.on('bookingCreated', (booking) => {
-            addBookingToList(booking);
-        });
+            const removeBookingFromList = (booking) => {
+                const listItem = document.getElementById(`booking-${booking._id}`);
+                if (listItem) {
+                    listItem.remove();
+                }
+            };
 
-        socket.on('bookingUpdated', (booking) => {
-            updateBookingInList(booking);
-        });
+            socket.on('connect', () => {
+                console.log('Connected to server');
+            });
 
-        socket.on('bookingDeleted', (booking) => {
-            removeBookingFromList(booking);
+            socket.on('bookingCreated', addBookingToList);
+            socket.on('bookingUpdated', updateBookingInList);
+            socket.on('bookingDeleted', removeBookingFromList);
         });
     </script>
 </body>
+
 </html>

@@ -9,19 +9,13 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
 - **Email confirmations** with PDF attachments using Nodemailer
 - **Dynamic HTML view** using EJS
 
-## Prerequisites
-
-- Node.js and npm installed
-- MongoDB instance running
-- Gmail account for sending emails
-
 ## Getting Started
 
 1. **Clone the repository**
 
     ```bash
     git clone https://github.com/amansirohiii/flightbooking.git
-    cd flight-booking-system
+    cd flightbooking
     ```
 
 2. **Install dependencies**
@@ -32,13 +26,19 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
 
 3. **Set up environment variables**
 
-    Create a `.env` file in the root of the project and add the following:
+    Create a `.env.local` file in the root of the project and add the following:
 
     ```env
-    PORT=3000
-    MONGO_URI=your_mongodb_connection_string
-    EMAIL_USER=your_gmail_email
-    EMAIL_PASS=your_gmail_password
+   PORT= 3000
+   MONGODB_URI=
+   EMAILJS_USER_ID=
+   EMAILJS_SERVICE_ID=
+   EMAILJS_TEMPLATE_ID=
+   EMAIL_USER= admin@amansirohi.me
+   EMAIL_PASSWORD=
+   CLOUDINARY_CLOUD_NAME=
+   CLOUDINARY_API_SECRET=
+   CLOUDINARY_API_KEY=
     ```
 
 4. **Start the server**
@@ -47,7 +47,7 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
     npm start
     ```
 
-    The server will start on the port specified in the `.env` file (default is 3000).
+    The server will start on the port specified in the `.env.local` file (default is 3000).
 
 ## API Endpoints
 
@@ -60,12 +60,12 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
     ```json
     {
         "flightNumber": "ABC123",
-        "passengerName": "John Doe",
+        "passengerName": "Aman Sirohi",
         "departureDate": "2024-06-16T00:00:00.000Z",
-        "seatNumber": "12A"
+        "seatNumber": "12A",
+        "email": "amansirohi077@gmail.com" *Optional & Default is amansirohi077@gmail.com*
     }
     ```
-
 ### Get All Bookings
 
 - **URL:** `/bookings`
@@ -82,7 +82,8 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
         "flightNumber": "DEF456",
         "passengerName": "Jane Doe",
         "departureDate": "2024-06-18T00:00:00.000Z",
-        "seatNumber": "14B"
+        "seatNumber": "14B",
+        "email": "amansirohi077@gmail.com"
     }
     ```
 
@@ -118,9 +119,12 @@ Navigate to [http://localhost:3000/bookings](http://localhost:3000/bookings) in 
 │   └── connection.js    # MongoDB connection setup
 ├── views
 │   └── bookings.ejs     # EJS template for the frontend
+│   └── edit.ejs
+│   └── index.ejs
+│   └── new.ejs
 ├── .env                 # Environment variables
 ├── package.json         # Project metadata and dependencies
-├── server.js            # Main server file
+├── index.js            # Main server file
 
 ```
 ## License
@@ -147,7 +151,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 - Ensure that less secure apps access is enabled for your Gmail account (for testing purposes only).
 - Verify the `EMAIL_USER` and `EMAIL_PASS` in your `.env` file are correct.
-- Check the transporter configuration in the `server.js` file.
+- Check the transporter configuration in the `index.js` file.
 
 ### Real-Time Updates Not Working
 
@@ -159,6 +163,3 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - Ensure the `bookings` directory exists in the root of your project.
 - Check the permissions of the `bookings` directory to ensure the server can write files to it.
 
-## Contributions
-
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.

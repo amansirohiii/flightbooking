@@ -10,13 +10,11 @@ import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import fs from 'fs';
-import ejs from 'ejs';
 import { PassThrough } from 'stream';
 import connectDB from './db/connection.js';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: `.env.local`, override: true });
 
 const app = express();
 const server = http.createServer(app);
