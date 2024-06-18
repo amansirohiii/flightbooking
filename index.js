@@ -1,17 +1,16 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import methodOverride from 'method-override';
 import http from 'http';
 import { Server as socketIo } from 'socket.io';
 import nodemailer from 'nodemailer';
 import PDFDocument from 'pdfkit';
-import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { PassThrough } from 'stream';
 import connectDB from './db/connection.js';
+import Booking from './models/Booking.model.js'
 import dotenv from 'dotenv';
 
 dotenv.config({ path: `.env.local`, override: true });
@@ -45,9 +44,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer configuration for handling file storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 // Middleware
 app.use(bodyParser.json());
@@ -60,17 +56,6 @@ app.use(express.static(path.join(__dirname, "public")));
 // MongoDB connection
 connectDB();
 
-// MongoDB Schema and Model
-const bookingSchema = new mongoose.Schema({
-    flightNumber: String,
-    passengerName: String,
-    departureDate: Date,
-    seatNumber: String,
-    pdfUrl: String,
-    email: { type: String, default: 'amansirohi077@gmail.com' },
-});
-
-const Booking = mongoose.model('Booking', bookingSchema);
 
 // Function to create PDF in memory
 const createPDF = (booking) => {
