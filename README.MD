@@ -127,10 +127,6 @@ Navigate to [http://localhost:3000/bookings](http://localhost:3000/bookings) in 
 ├── index.js            # Main server file
 
 ```
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Acknowledgements
 
 - Express
@@ -140,26 +136,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - PDFKit
 - EJS
 
-## Troubleshooting
 
-### MongoDB Connection Issues
-
-- Ensure that your MongoDB instance is running and accessible.
-- Verify the `MONGO_URI` in your `.env` file is correct.
-
-### Email Sending Issues
-
-- Ensure that less secure apps access is enabled for your Gmail account (for testing purposes only).
-- Verify the `EMAIL_USER` and `EMAIL_PASS` in your `.env` file are correct.
-- Check the transporter configuration in the `index.js` file.
-
-### Real-Time Updates Not Working
-
-- Ensure that the Socket.io client is correctly connected to the server.
-- Check the server logs for any errors related to Socket.io connections.
-
-### PDF Generation Issues
-
-- Ensure the `bookings` directory exists in the root of your project.
-- Check the permissions of the `bookings` directory to ensure the server can write files to it.
 
