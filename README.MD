@@ -31,9 +31,6 @@ This project is a Flight Booking System built with Node.js, Express, MongoDB, an
     ```env
    PORT= 3000
    MONGODB_URI=
-   EMAILJS_USER_ID=
-   EMAILJS_SERVICE_ID=
-   EMAILJS_TEMPLATE_ID=
    EMAIL_USER= admin@amansirohi.me
    EMAIL_PASSWORD=
    CLOUDINARY_CLOUD_NAME=
